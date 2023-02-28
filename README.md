@@ -82,13 +82,14 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
     mapping(uint => Post) internal posts;
     mapping (uint => Comment[]) internal commentsMapping;
+    mapping(address => mapping(uint => bool)) internal liked;
 
 
     function newPost(
         string memory _image,
         string memory _title,
         string memory _description
-         )
+         ) 
          public {
             address _user = msg.sender;
             uint _likes = 0;
@@ -104,10 +105,14 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
     }
 
     function addComment(uint _index, string memory _description) public{
+        require(_index < postLength, "Post does not exist.");
         commentsMapping[_index].push(Comment(msg.sender, _description));
     }
 
     function likePost(uint _index) public{
+        require(_index < postLength, "Post does not exist.");
+        require(!liked[msg.sender][_index], "You have already liked this post.");
+        liked[msg.sender][_index] = true;
         posts[_index].likes++;
     }
 
@@ -132,6 +137,7 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
     }
 
     function sendTip(uint _index, uint _ammount) public payable  {
+        require(_index < postLength, "Post does not exist.");
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
              msg.sender,
@@ -144,7 +150,7 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
     function getPostsLength() public view returns(uint){
         return(postLength);
-    }
+    }     
 
 }
 ```
@@ -214,6 +220,7 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
     mapping(uint => Post) internal posts;
     mapping (uint => Comment[]) internal commentsMapping;
+    mapping(address => mapping(uint => bool)) internal liked;
 }
 
 ```
@@ -232,7 +239,7 @@ We also declare a struct called `Comment` which will be used to store informatio
 1. An `address` for the user who created the comment.
 2. A `string` for the description.
 
-We then declare 2 mapping variables - one called `posts`, which will map each post index to a Post `struct`, and one called `commentsMapping`, which will map each post index to an `array` of Comment `structs`.
+We then declare 3 mapping variables - one called `posts`, which will map each post index to a Post `struct`, the second one called `commentsMapping` and the last one is called `liked` which will map an address to a nested mapping which then maps a post `index` to a `boolean` value used to keep track of the posts liked by an address, which will map each post index to an `array` of Comment `structs`.
 
 ```solidity
 function newPost(
@@ -258,7 +265,8 @@ function newPost(
 Next, we declare the `newPost()` function, which allows users to create new posts. This function takes 3 string parameters - an `image`, a `title`, and a `description` - and uses them to populate the Post `struct`. A user `address` is also included in the Post `struct`, which is set to the `address` of the user who called the function. The likes element of the Post struct is set to 0. After that, we increase the value of the `postLength` variable by one.
 
 ```solidity
-function addComment(uint _index, string memory _description) public{
+    function addComment(uint _index, string memory _description) public{
+        require(_index < postLength, "Post does not exist.");
         commentsMapping[_index].push(Comment(msg.sender, _description));
     }
 ```
@@ -266,12 +274,15 @@ function addComment(uint _index, string memory _description) public{
 The `addComment()` function allows users to add comments to existing posts. This function takes 2 parameters - a post index and a description - and uses them to populate a Comment `struct`. The `address` of the user who called the function is also stored in the Comment `struct`.
 
 ```solidity
-function likePost(uint _index) public{
+    function likePost(uint _index) public{
+        require(_index < postLength, "Post does not exist.");
+        require(!liked[msg.sender][_index], "You have already liked this post.");
+        liked[msg.sender][_index] = true;
         posts[_index].likes++;
     }
 ```
 
-The `likePost()` function allows users to like existing posts. This function takes a post index as a parameter, and increases the `likes` element of the Post struct by 1.
+The `likePost()` function allows users to like existing posts only once. This function takes a post index as a parameter and increases the `likes` element of the Post struct by 1 after checking that the `_index` is valid and that the _sender_ hasn't yet liked the post.
 
 ```solidity
 function getPost(uint _index) public view returns(
@@ -298,7 +309,8 @@ function getPost(uint _index) public view returns(
 The `getPost()` function allows users to view an existing post. This function takes a post index as a parameter and returns the user `address`, `image`, `title`, `description`, and `likes` of the Post `struct`, as well as an `array` of Comment `structs` associated with the post.
 
 ```solidity
-function sendTip(uint _index, uint _ammount) public payable  {
+    function sendTip(uint _index, uint _ammount) public payable  {
+        require(_index < postLength, "Post does not exist.");
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
              msg.sender,
@@ -310,7 +322,7 @@ function sendTip(uint _index, uint _ammount) public payable  {
     }
 ```
 
-The next function is the `sendTip()`. This function will be used to send a tip in cUSD to a specific user from a list of posts. we first added checks to make sure the transfer of funds is possible using the `IERC20Token` contract. It then uses the `transferFrom` function, which allows a third party to transfer funds on behalf of the ***from*** address, to send the tip to the specified user. It takes three parameters, the `sender`, the `user` to receive the tip, and the amount of the tip. If the transfer is successful, the code returns a success message, otherwise, it will return an error.
+The next function is the `sendTip()`. This function will be used to send a tip in cUSD to a specific user from a list of posts. we first added checks to make sure that the `_index` provided is valid and that the transfer of funds is successful. The transfer of cUSD tokens occurs through the `transferFrom` function, which allows a third party to transfer funds on behalf of the ***from*** address, to send the tip to the specified user. It takes three parameters, the `sender`, the `user` to receive the tip, and the amount of the tip. If the transfer is successful, the code returns a success message, otherwise, it will return an error.
 
 ```solidity
     function getPostsLength() public view returns(uint){
