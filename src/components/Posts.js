@@ -78,9 +78,8 @@ export const Posts = (props) => {
                 </div>
               </form>
               <h2 className="mt-3">Comments</h2>
-              {props.walletAddress === post.user &&
-                post.comments.map((c) => (
-                  <p class="card-text ">
+              { post.comments.map((c, i) => (
+                  <p class="card-text " key={i}>
                     {c.description} <hr />
                   </p>
                 ))}

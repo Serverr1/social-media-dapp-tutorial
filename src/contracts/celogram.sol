@@ -35,6 +35,7 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
     mapping(uint => Post) internal posts;
     mapping (uint => Comment[]) internal commentsMapping;
+    mapping(address => mapping(uint => bool)) internal liked;
 
 
     function newPost(
@@ -57,10 +58,14 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
     }
 
     function addComment(uint _index, string memory _description) public{
+        require(_index < postLength, "Post does not exist.");
         commentsMapping[_index].push(Comment(msg.sender, _description));
     }
 
     function likePost(uint _index) public{
+        require(_index < postLength, "Post does not exist.");
+        require(!liked[msg.sender][_index], "You have already liked this post.");
+        liked[msg.sender][_index] = true;
         posts[_index].likes++;
     }
 
@@ -85,6 +90,7 @@ address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
     }
 
     function sendTip(uint _index, uint _ammount) public payable  {
+        require(_index < postLength, "Post does not exist.");
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
              msg.sender,
