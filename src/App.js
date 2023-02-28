@@ -6,7 +6,7 @@ import Web3 from "web3";
 import { newKitFromWeb3 } from "@celo/contractkit";
 import celogram from "./contracts/celogram.abi.json";
 import IERC from "./contracts/IERC.abi.json";
-
+import BigNumber from "bignumber.js";
 const ERC20_DECIMALS = 18;
 const contractAddress = "0x2d6dcdA3A131Dc4819EF572c6CE5A0c573E7175E";
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
@@ -110,7 +110,9 @@ function App() {
   const sendTip = async (_index, _ammount) => {
     try {
       const cUSDContract = new kit.web3.eth.Contract(IERC, cUSDContractAddress);
-
+      _ammount = new BigNumber(_ammount)
+      .shiftedBy(ERC20_DECIMALS)
+      .toString()
       await cUSDContract.methods
         .approve(contractAddress, _ammount)
         .send({ from: address });
@@ -144,7 +146,7 @@ function App() {
       <Home cUSDBalance={cUSDBalance} addPost={addPost} />
       <Posts
         posts={posts}
-        likePost={likePost}
+        like={likePost}
         addComment={addComment}
         sendTip={sendTip}
         walletAddress={address}

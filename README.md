@@ -463,7 +463,9 @@ function App() {
   const sendTip = async (_index, _ammount) => {
     try {
       const cUSDContract = new kit.web3.eth.Contract(IERC, cUSDContractAddress);
-
+      _ammount = new BigNumber(_ammount)
+      .shiftedBy(ERC20_DECIMALS)
+      .toString()
       await cUSDContract.methods
         .approve(contractAddress, _ammount)
         .send({ from: address });
@@ -497,7 +499,7 @@ function App() {
       <Home cUSDBalance={cUSDBalance} addPost={addPost} />
       <Posts
         posts={posts}
-        likePost={likePost}
+        like={likePost}
         addComment={addComment}
         sendTip={sendTip}
         walletAddress={address}
@@ -643,24 +645,27 @@ const likePost = async (_index) => {
   }
 };
 
-const sendTip = async (_index, _ammount) => {
-  try {
-    const cUSDContract = new kit.web3.eth.Contract(IERC, cUSDContractAddress);
 
-    await cUSDContract.methods
-      .approve(contractAddress, _ammount)
-      .send({ from: address });
-    await contract.methods.sendTip(_index, _ammount).send({ from: address });
-    getPosts();
-    getBalance();
-    alert("you have successfully sent cusd to this user");
-  } catch (error) {
-    alert(error);
-  }
-};
+  const sendTip = async (_index, _ammount) => {
+    try {
+      const cUSDContract = new kit.web3.eth.Contract(IERC, cUSDContractAddress);
+      _ammount = new BigNumber(_ammount)
+      .shiftedBy(ERC20_DECIMALS)
+      .toString()
+      await cUSDContract.methods
+        .approve(contractAddress, _ammount)
+        .send({ from: address });
+      await contract.methods.sendTip(_index, _ammount).send({ from: address });
+      getPosts();
+      getBalance();
+      alert("you have successfully sent cusd to this user");
+    } catch (error) {
+      alert(error);
+    }
+  };
 ```
 
-Next, we create the `addPost()`, `addComment()` and `likePost()` functions that allow users to interact with the functionalities of our smart contract.
+Next, we create the `addPost()`, `addComment()`, `likePost()` and `sendTip()` functions that allow users to interact with the functionalities of our smart contract.
 
 ```javascript
 useEffect(() => {
@@ -686,13 +691,13 @@ We use multiple `useEffect` hooks to call the `connectToWallet()`, `getBalance()
 return (
   <div className="App">
     <Home cUSDBalance={cUSDBalance} addPost={addPost} />
-    <Posts
-      posts={posts}
-      likePost={likePost}
-      addComment={addComment}
-      sendTip={sendTip}
-      walletAddress={address}
-    />
+      <Posts
+        posts={posts}
+        like={likePost}
+        addComment={addComment}
+        sendTip={sendTip}
+        walletAddress={address}
+      />
   </div>
 );
 
