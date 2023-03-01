@@ -11,18 +11,19 @@ image
 
 To fully follow up with these tutorials, you should have a basic understanding of the following technologies.
 
-Solidity, smart-contract and blockchain concepts.
-React.
-Basic web Development.
+- Solidity, smart contract and blockchain concepts
+- Deployment of smart contract using Remix
+- Experience working with React
+- Basic web Development
 
 ## Requirements
 
-- Solidity.
-- React.
-- Bootstrap.
-- NodeJS 12.0.1 upwards installed.
-- Celo Extension Wallet.
-- Remix IDE
+- [Solidity](https://soliditylang.org/)
+- [React](https://reactjs.org/)
+- [Bootstrap](https://getbootstrap.com/)
+- [NodeJS](https://nodejs.org/) 12.0.1 upwards installed
+- [Celo Extension Wallet](https://docs.celo.org/wallet)
+- [Remix IDE](https://remix.ethereum.org/)
 
 ## SmartContract
 
@@ -49,88 +50,88 @@ interface IERC20Token {
 
 contract Celogram{
 
-uint private postLength = 0;
-address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
+  uint private postLength = 0;
+  address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
-    struct Post{
-        address user;
-        string image;
-        string title;
-        string description;
-        uint likes;
-    }
+  struct Post{
+      address user;
+      string image;
+      string title;
+      string description;
+      uint likes;
+  }
 
-    struct Comment{
-        address owner;
-        string description;
-    }
-
-
-    mapping(uint => Post) internal posts;
-    mapping (uint => Comment[]) internal commentsMapping;
+  struct Comment{
+      address owner;
+      string description;
+  }
 
 
-    function newPost(
-        string memory _image,
-        string memory _title,
-        string memory _description
-         )
-         public {
-            address _user = msg.sender;
-            uint _likes = 0;
+  mapping(uint => Post) internal posts;
+  mapping (uint => Comment[]) internal commentsMapping;
 
-            posts[postLength] = Post(
-                _user,
-                _image,
-                _title,
-                _description,
-                _likes
-            );
-            postLength++;
-    }
 
-    function addComment(uint _index, string memory _description) public{
-        commentsMapping[_index].push(Comment(msg.sender, _description));
-    }
+  function newPost(
+      string memory _image,
+      string memory _title,
+      string memory _description
+        )
+        public {
+    address _user = msg.sender;
+    uint _likes = 0;
 
-    function likePost(uint _index) public{
-        posts[_index].likes++;
-    }
+    posts[postLength] = Post(
+        _user,
+        _image,
+        _title,
+        _description,
+        _likes
+    );
+    postLength++;
+  }
 
-    function getPost(uint _index) public view returns(
-        address,
-        string memory,
-        string memory,
-        string memory,
-        uint,
-        Comment[] memory
-    ){
-         Post memory post = posts[_index];
-         Comment[] memory comments = commentsMapping[_index];
-         return(
-             post.user,
-             post.image,
-             post.title,
-             post.description,
-             post.likes,
-             comments
-         );
-    }
+  function addComment(uint _index, string memory _description) public{
+      commentsMapping[_index].push(Comment(msg.sender, _description));
+  }
 
-    function sendTip(uint _index, uint _ammount) public payable  {
-        require(
-          IERC20Token(cUsdTokenAddress).transferFrom(
-             msg.sender,
-             posts[_index].user,
-             _ammount
-          ),
-          "Transfer failed."
-        );
-    }
+  function likePost(uint _index) public{
+      posts[_index].likes++;
+  }
 
-    function getPostsLength() public view returns(uint){
-        return(postLength);
-    }
+  function getPost(uint _index) public view returns(
+      address,
+      string memory,
+      string memory,
+      string memory,
+      uint,
+      Comment[] memory
+  ){
+    Post memory post = posts[_index];
+    Comment[] memory comments = commentsMapping[_index];
+    return(
+        post.user,
+        post.image,
+        post.title,
+        post.description,
+        post.likes,
+        comments
+    );
+  }
+
+  function sendTip(uint _index, uint _ammount) public payable  {
+    require(
+      IERC20Token(cUsdTokenAddress).transferFrom(
+          msg.sender,
+          posts[_index].user,
+          _ammount
+      ),
+      "Transfer failed."
+    );
+  }
+
+  function getPostsLength() public view returns(uint){
+    return(postLength);
+  }
 
 }
 ```
@@ -158,79 +159,84 @@ interface IERC20Token {
 }
 ```
 
-Next we declare an interface for the cUSD ERC20 token. An interface is a collection of functions that define the behavior of a contract. In this case, the interface defines the functions necessary for an ERC20 token.
+Next, we declare an interface for the cUSD ERC20 token. An interface is a collection of functions that define the behavior of a contract. In this case, the interface defines the functions necessary for an ERC20 token.
 
-The first function is the "transfer" function. This function allows a user to transfer tokens from one address to another. The function takes two parameters: an address to transfer the tokens to, and an amount of tokens to transfer. The function then returns a boolean value that indicates whether or not the transfer was successful.
+The first function is the `transfer` function. This function allows a user to transfer tokens from one address to another. The function takes two parameters: an address to transfer the tokens to, and an amount of tokens to transfer. The function then returns a boolean value that indicates whether or not the transfer was successful.
 
-The second function is the "approve" function. This function allows a user to approve another user to transfer tokens from their address. The function takes two parameters: an address to approve, and an amount of tokens to approve for transfer. The function then returns a boolean value that indicates whether or not the approval was successful.
+The second function is the `approve` function. This function allows a user to approve another user to transfer tokens from their address. The function takes two parameters: an address to approve, and an amount of tokens to approve for transfer. The function then returns a boolean value that indicates whether or not the approval was successful.
 
-The third function is the "transferFrom" function. This function allows a user to transfer tokens from one address to another. The function takes three parameters: an address to transfer the tokens from, an address to transfer the tokens to, and an amount of tokens to transfer. The function then returns a boolean value that indicates whether or not the transfer was successful.
+The third function is the `transferFrom` function. This function allows a user to transfer tokens from one address to another. The function takes three parameters: an address to transfer the tokens from, an address to transfer the tokens to, and an amount of tokens to transfer. The function then returns a boolean value that indicates whether or not the transfer was successful.
 
-The fourth function is the "totalSupply" function. This function returns the total amount of tokens in circulation. It takes no parameters and returns a uint256 value.
+The fourth function is the `totalSupply` function. This function returns the total amount of tokens in circulation. It takes no parameters and returns a uint256 value.
 
-The fifth function is the "balanceOf" function. This function returns the balance of tokens held by a particular address. It takes one parameter, an address, and returns a uint256 value.
+The fifth function is the `balanceOf` function. This function returns the balance of tokens held by a particular address. It takes one parameter, an address, and returns a uint256 value.
 
-The sixth function is the "allowance" function. This function returns the amount of tokens that a particular address is allowed to transfer. It takes two parameters, an address to check and an address to transfer from, and returns a uint256 value.
+The sixth function is the `allowance` function. This function returns the amount of tokens that a particular address is allowed to transfer. It takes two parameters, an address to check and an address to transfer from, and returns a uint256 value.
 
-The final two functions are events. The "Transfer" event is triggered whenever tokens are transferred from one address to another. It takes three parameters: the address from which the tokens were transferred, the address to which the tokens were transferred, and the amount of tokens that were transferred.
+The final two functions are events
 
-The "Approval" event is triggered whenever an address is approved to transfer tokens from another address. It takes three parameters: the address of the owner of the tokens, the address of the spender, and the amount of tokens that have been approved for transfer.
+1. The `Transfer` event is triggered whenever tokens are transferred from one address to another. It takes three parameters: the address from which the tokens were transferred, the address to which the tokens were transferred, and the amount of tokens that were transferred.
+
+2. The `Approval` event is triggered whenever an address is approved to transfer tokens from another address. It takes three parameters: the address of the owner of the tokens, the address of the spender, and the amount of tokens that have been approved for transfer.
 
 This code provides a basic interface for an ERC20 token. It defines the functions necessary for token transfers, approvals, and balance checks.
 
 ```solidity
 contract Celogram{
 
-uint private postLength = 0;
-address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
+  uint private postLength = 0;
+  address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
-    struct Post{
-        address user;
-        string image;
-        string title;
-        string description;
-        uint likes;
-    }
+  struct Post{
+      address user;
+      string image;
+      string title;
+      string description;
+      uint likes;
+  }
 
-    struct Comment{
-        address owner;
-        string description;
-    }
+  struct Comment{
+      address owner;
+      string description;
+  }
 
 
-    mapping(uint => Post) internal posts;
-    mapping (uint => Comment[]) internal commentsMapping;
+  mapping(uint => Post) internal posts;
+  mapping (uint => Comment[]) internal commentsMapping;
 }
 
 ```
 
 In this section, we created a smart contract with the name Celogram.
-Inside the smart contract, we first declare a private variable called postLength, which will store the current length of the posts in the mapping.
+Inside the smart contract, we first declare a private variable called `postLength`, which will store the current length of the posts in the mapping.
 
 Next, we declare a struct called `Post` which will be used to store information about each post. This struct contains 5 elements - an `address` for the user who created the post, a `string` for the image, a `string` for the title, a `string` for the description, and a `uint` for the number of likes.
 
 We also declare a struct called `Comment` which will be used to store information about each comment. This struct contains 2 elements - an `address` for the user who created the comment, and a `string` for the description.
 
-We then declare 2 mapping variables - one called `posts`, which will map each post index to a Post `struct`, and one called `commentsMapping`, which will map each post index to an `array` of Comment `structs`.
+We then declare 2 mapping variables
+
+1. `posts`, which will map each post index to a Post `struct`, 
+2. `commentsMapping`, which will map each post index to an `array` of Comment `structs`.
 
 ```solidity
 function newPost(
-        string memory _image,
-        string memory _title,
-        string memory _description
-         )
-         public {
-            address _user = msg.sender;
-            uint _likes = 0;
-            posts[postLength] = Post(
-                _user,
-                _image,
-                _title,
-                _description,
-                _likes
-            );
-            postLength++;
-    }
+  string memory _image,
+  string memory _title,
+  string memory _description
+  )
+  public {
+    address _user = msg.sender;
+    uint _likes = 0;
+    posts[postLength] = Post(
+        _user,
+        _image,
+        _title,
+        _description,
+        _likes
+    );
+    postLength++;
+}
 
 ```
 
@@ -238,16 +244,16 @@ Next, we declare the `newPost()` function, which allows users to create new post
 
 ```solidity
 function addComment(uint _index, string memory _description) public{
-        commentsMapping[_index].push(Comment(msg.sender, _description));
-    }
+  commentsMapping[_index].push(Comment(msg.sender, _description));
+}
 ```
 
 The `addComment()` function allows users to add comments to existing posts. This function takes 2 arguments - a post index and a description - and uses them to populate a Comment `struct`. The `address` of the user who called the function is also stored in the Comment `struct`.
 
 ```solidity
 function likePost(uint _index) public{
-        posts[_index].likes++;
-    }
+  posts[_index].likes++;
+}
 ```
 
 The `likePost()` function allows users to like existing posts. This function takes a post index as an argument, and increases the `likes` element of the Post struct by 1.
@@ -261,40 +267,40 @@ function getPost(uint _index) public view returns(
         uint,
         Comment[] memory
     ){
-         Post memory post = posts[_index];
-         Comment[] memory comments = commentsMapping[_index];
-         return(
-             post.user,
-             post.image,
-             post.title,
-             post.description,
-             post.likes,
-             comments
-         );
-    }
+  Post memory post = posts[_index];
+  Comment[] memory comments = commentsMapping[_index];
+  return(
+      post.user,
+      post.image,
+      post.title,
+      post.description,
+      post.likes,
+      comments
+  );
+}
 ```
 
-The `getPost()` function allows users to view an existing post. This function takes a post index as an argument, and returns the user `address`, `image`, `title`, `description`, and `likes` of the Post `struct`, as well as an `array` of Comment `structs` associated with the post.
+The `getPost()` function allows users to view an existing post. This function takes a post index as an argument and returns the user `address`, `image`, `title`, `description`, and `likes` of the Post `struct`, as well as an `array` of Comment `structs` associated with the post.
 
 ```solidity
 function sendTip(uint _index, uint _ammount) public payable  {
-        require(
-          IERC20Token(cUsdTokenAddress).transferFrom(
-             msg.sender,
-             posts[_index].user,
-             _ammount
-          ),
-          "Transfer failed."
-        );
-    }
+  require(
+    IERC20Token(cUsdTokenAddress).transferFrom(
+        msg.sender,
+        posts[_index].user,
+        _ammount
+    ),
+    "Transfer failed."
+  );
+}
 ```
 
 The next function is the `sendTip()`. This function will be used to send a tip in cUSD to a specific user from a list of posts. we first added checks to make sure the transfer of funds is possible using the `IERC20Token` contract. It then uses the `transferFrom` function, which allows a third party to transfer funds on behalf of the sender, to send the tip to the specified user. It takes three parameters, the `sender`, the `user` to receive the tip, and the amount of the tip. If the transfer is successful, the code returns a success message, otherwise, it will return an error.
 
 ```solidity
-    function getPostsLength() public view returns(uint){
-        return(postLength);
-    }
+  function getPostsLength() public view returns(uint){
+     return(postLength);
+  }
 ```
 
 Finally, the `getPostsLength()` function allows users to view the current length of the `posts array`. This function takes no arguments and returns the value of the postLength variable.
@@ -303,17 +309,17 @@ Finally, the `getPostsLength()` function allows users to view the current length
 
 To deploy our smart contract successfully, we need the celo extention wallet which can be downloaded from [here](https://chrome.google.com/webstore/detail/celoextensionwallet/kkilomkmpmkbdnfelcpgckmpcaemjcdh?hl=en)
 
-Next, we need to fund our newly created wallet which can done using the celo alfojares faucet [Here](https://celo.org/developers/faucet)
+Next, we need to fund our newly created wallet which can be done using the celo alfajores faucet [Here](https://celo.org/developers/faucet)
 
 You can now fund your wallet and deploy your contract using the celo plugin in remix.
 
-### Frontend
+## Frontend
 
 - Clone the repo to your computer.
-- open the project from from vscode.
+- open the project from vscode.
 - Run `npm install` command to install all the dependencies required to run the app locally.
 
-#### App.js
+### App.js
 
 The completed code should look like this.
 
@@ -508,7 +514,7 @@ const [cUSDBalance, setcUSDBalance] = useState(0);
 const [posts, setPosts] = useState([]);
 ```
 
-We use React Hooks to set the initial state for the contract, address, kit, cUSDBalance and posts.
+We use React Hooks to set the initial state for the contract, address, kit, cUSDBalance, and posts.
 
 ```javascript
 const connectToWallet = async () => {
@@ -533,7 +539,7 @@ const connectToWallet = async () => {
 };
 ```
 
-Next, we created a the `connectToWallet()` function that allows the user to connect to their wallet and sets the address and kit.
+Next, we created the `connectToWallet()` function that allows the user to connect to their wallet and sets the address and kit.
 
 ```javascript
 const getBalance = useCallback(async () => {
@@ -627,7 +633,7 @@ const sendTip = async (_index, _ammount) => {
 };
 ```
 
-Next, we create the `addPost()`, `addComment()` and `likePost()` functions that allow users to interact with the smart contract.
+Next, we create the `addPost()`, `addComment()`, and `likePost()` functions that allow users to interact with the smart contract.
 
 ```javascript
 useEffect(() => {
@@ -668,4 +674,9 @@ export default App;
 
 And finally, we render the App component and return the Home and Posts components with the necessary props.
 
-The End.
+## Conclustion
+Finally, we have finished the tutorial and learned how to create a social media dapp 
+
+## Next steps
+- You can add more functionality and experiment with the contract and the front end 
+- Build other types of dapps with the basics learned from the tutorial
